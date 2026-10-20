@@ -1,0 +1,235 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Resume Analyzer</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; background: #f4f7ff; color: #1f2937; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 24px; }
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+    .brand { font-weight: 800; font-size: 1.6rem; }
+    .nav a { margin-left: 18px; text-decoration: none; color: #374151; }
+    .hero { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 24px; padding: 24px 0; }
+    .hero-box, .card { background: white; border-radius: 18px; box-shadow: 0 10px 30px rgba(31,41,55,.08); padding: 24px; }
+    h1 { font-size: 3rem; margin: 0 0 16px; }
+    .lead { color: #4b5563; line-height: 1.7; }
+    .btn-row { display: flex; gap: 12px; margin-top: 24px; }
+    button { border: none; border-radius: 12px; padding: 12px 22px; font-size: 1rem; cursor: pointer; }
+    .primary { background: #464feb; color: white; }
+    .secondary { background: #eef2ff; color: #464feb; }
+    .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 28px; }
+    .stats div { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 12px; padding: 16px; }
+    .score-panel { text-align: center; }
+    .meter { height: 150px; display: flex; align-items: end; gap: 12px; justify-content: center; margin-top: 18px; }
+    .meter span { display: block; width: 34px; border-radius: 10px 10px 0 0; background: linear-gradient(#8ea3ff, #464feb); }
+    .analyzer { margin-top: 30px; }
+    .fields { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    textarea { width: 100%; min-height: 260px; padding: 16px; border-radius: 12px; border: 1px solid #dfe3ec; font-size: 1rem; }
+    .actions { margin-top: 18px; }
+    .results { margin-top: 28px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+    .score-box { display: flex; align-items: center; gap: 18px; }
+    .ring {
+      width: 120px; height: 120px; border-radius: 50%; display: grid; place-items: center;
+      background: conic-gradient(#464feb 0deg, #e5e7eb 0deg);
+      position: relative;
+    }
+    .ring::before { content: ''; position: absolute; inset: 12px; border-radius: 50%; background: white; }
+    .ring-value { position: relative; z-index: 1; font-weight: bold; font-size: 2rem; }
+    .chip-list { display: flex; flex-wrap: wrap; gap: 10px; }
+    .chip { background: #e8fff5; color: #166534; border-radius: 999px; padding: 8px 12px; font-size: 0.9rem; }
+    .chip.missing { background: #fff1f2; color: #b91c1c; }
+    ul { margin: 0; padding-left: 18px; line-height: 1.8; }
+    @media (max-width: 760px) {
+      .hero, .fields, .results, .stats { grid-template-columns: 1fr; }
+      .header { flex-direction: column; align-items: flex-start; gap: 12px; }
+      h1 { font-size: 2.4rem; }
+      .btn-row, .actions { flex-direction: column; }
+      button { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <div class="brand">AI Resume Analyzer</div>
+      <nav class="nav">
+        <a href="#features">Features</a>
+        <a href="#analyzer">Analyzer</a>
+        <a href="#results">Results</a>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <div class="hero-box">
+        <p style="color:#464feb; font-weight:700; text-transform:uppercase; letter-spacing:.1em; font-size:.8rem; margin:0 0 10px;">Career intelligence for smarter applications</p>
+        <h1>Optimize every resume for ATS and interview success.</h1>
+        <p class="lead">Identify missing skills, compare your resume with the job description, and get actionable advice to improve ATS compatibility before you apply.</p>
+        <div class="btn-row">
+          <button class="primary" id="focusButton">Analyze Resume</button>
+          <button class="secondary" id="sampleButton">Try Sample</button>
+        </div>
+        <div class="stats">
+          <div><strong>ATS Focus</strong><div>Keyword match</div></div>
+          <div><strong>Skill Gaps</strong><div>Actionable feedback</div></div>
+          <div><strong>Career Boost</strong><div>Interview readiness</div></div>
+        </div>
+      </div>
+      <div class="hero-box score-panel">
+        <h3>ATS Score</h3>
+        <div style="font-size: 3rem; font-weight: 800; color:#464feb;">86%</div>
+        <div class="meter">
+          <span style="height: 40%"></span>
+          <span style="height: 62%"></span>
+          <span style="height: 74%"></span>
+          <span style="height: 86%"></span>
+          <span style="height: 94%"></span>
+        </div>
+      </div>
+    </section>
+
+    <section id="features" class="results" style="margin-top:16px;">
+      <div class="card">
+        <h3>ATS Compatibility</h3>
+        <p>Checks keyword alignment and formatting for job-specific screening systems.</p>
+      </div>
+      <div class="card">
+        <h3>Missing Skills</h3>
+        <p>Highlights skills gaps between your profile and the role requirements.</p>
+      </div>
+      <div class="card">
+        <h3>Actionable Feedback</h3>
+        <p>Provides specific improvements to boost your interview readiness and resume strength.</p>
+      </div>
+    </section>
+
+    <section id="analyzer" class="analyzer card" style="margin-top:30px;">
+      <h2>Analyze a resume against a job description</h2>
+      <div class="fields">
+        <div>
+          <label for="resumeInput"><strong>Resume</strong></label><br /><br />
+          <textarea id="resumeInput" placeholder="Paste your resume here..."></textarea>
+        </div>
+        <div>
+          <label for="jobInput"><strong>Job Description</strong></label><br /><br />
+          <textarea id="jobInput" placeholder="Paste the job description here..."></textarea>
+        </div>
+      </div>
+      <div class="actions btn-row">
+        <button class="primary" id="analyzeButton">Analyze</button>
+        <button class="secondary" id="clearButton">Clear</button>
+      </div>
+    </section>
+
+    <section id="results" class="results" style="margin-top:30px;">
+      <div class="card score-box">
+        <div class="ring"><div class="ring-value" id="scoreValue">0</div></div>
+        <div>
+          <h3>ATS Compatibility</h3>
+          <p id="statusText">Waiting for analysis</p>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Quick Metrics</h3>
+        <ul>
+          <li>Keyword Match: <strong id="keywordCoverage">0%</strong></li>
+          <li>Resume Strength: <strong id="formatScore">0%</strong></li>
+          <li>Missing Skills: <strong id="missingCount">0</strong></li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Matched Skills</h3>
+        <div class="chip-list" id="matchedSkills"><span class="chip">No analysis yet</span></div>
+      </div>
+      <div class="card" style="grid-column: 1 / -1;">
+        <h3>Missing Skills</h3>
+        <div class="chip-list" id="missingSkills"><span class="chip missing">No major gaps found yet</span></div>
+      </div>
+      <div class="card" style="grid-column: 1 / -1;">
+        <h3>Improvement Suggestions</h3>
+        <ul id="suggestionsList">
+          <li>Paste both a resume and a job description to get suggestions.</li>
+        </ul>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const SKILLS = ['communication','leadership','teamwork','problem solving','analytical thinking','python','sql','javascript','html','css','react','project management','excel','power bi','tableau','data analysis','agile','scrum','git','aws','docker','machine learning','research','presentation','critical thinking','customer service'];
+    const sampleResume = `Senior computer science student with experience in Python, SQL, JavaScript, HTML, CSS, and React. Built dashboards using Power BI and Excel for data analysis. Worked on team projects with Git and Agile workflows. Strong communication, leadership, presentation, and analytical thinking skills. Interested in software engineering, data analysis, and project support roles.`;
+    const sampleJob = `We are hiring a Junior Data Analyst. Must have strong analytical thinking, SQL, Excel, Power BI, data analysis, reporting, communication, and teamwork skills. Experience with Python, dashboard creation, and project management is a plus.`;
+
+    const resumeInput = document.getElementById('resumeInput');
+    const jobInput = document.getElementById('jobInput');
+    const scoreValue = document.getElementById('scoreValue');
+    const statusText = document.getElementById('statusText');
+    const keywordCoverage = document.getElementById('keywordCoverage');
+    const formatScore = document.getElementById('formatScore');
+    const missingCount = document.getElementById('missingCount');
+    const matchedSkills = document.getElementById('matchedSkills');
+    const missingSkills = document.getElementById('missingSkills');
+    const suggestionsList = document.getElementById('suggestionsList');
+
+    function normalize(text) {
+      return text.toLowerCase().replace(/[^a-z0-9\s]/g, ' ').replace(/\s+/g, ' ').trim();
+    }
+
+    function scoreResume() {
+      const resumeText = resumeInput.value.trim();
+      const jobText = jobInput.value.trim();
+      if (!resumeText || !jobText) {
+        alert('Please paste both a resume and a job description.');
+        return;
+      }
+
+      const normalizedResume = normalize(resumeText);
+      const normalizedJob = normalize(jobText);
+      const matched = SKILLS.filter(skill => normalizedResume.includes(skill) && normalizedJob.includes(skill));
+      const missing = SKILLS.filter(skill => normalizedJob.includes(skill) && !normalizedResume.includes(skill));
+      const keywordMatch = matched.length ? (matched.length / SKILLS.length) * 100 : 35;
+      const formatting = resumeText.length > 200 && /(experience|education|skills|projects)/i.test(resumeText) ? 86 : 68;
+      const score = Math.min(100, Math.round((keywordMatch * 0.7) + (formatting * 0.3)));
+
+      scoreValue.textContent = score;
+      document.querySelector('.ring').style.background = 'conic-gradient(#464feb ' + (score * 3.6) + 'deg, #e5e7eb 0deg)';
+      statusText.textContent = score >= 80 ? 'Strong ATS fit' : score >= 60 ? 'Good potential' : 'Needs improvement';
+      keywordCoverage.textContent = Math.round(keywordMatch) + '%';
+      formatScore.textContent = formatting + '%';
+      missingCount.textContent = missing.length;
+
+      matchedSkills.innerHTML = matched.length ? matched.map(skill => '<span class="chip">' + skill + '</span>').join('') : '<span class="chip">No direct match</span>';
+      missingSkills.innerHTML = missing.length ? missing.map(skill => '<span class="chip missing">' + skill + '</span>').join('') : '<span class="chip missing">No major gaps found</span>';
+
+      const suggestions = [];
+      if (missing.length) suggestions.push('Add evidence for: ' + missing.slice(0, 3).join(', ') + ' in your resume.');
+      suggestions.push('Use clear headings like Experience, Skills, Education, and Projects.');
+      suggestions.push('Add measurable achievements and numbers to improve recruiter confidence.');
+      suggestionsList.innerHTML = suggestions.map(item => '<li>' + item + '</li>').join('');
+    }
+
+    document.getElementById('analyzeButton').addEventListener('click', scoreResume);
+    document.getElementById('sampleButton').addEventListener('click', () => {
+      resumeInput.value = sampleResume;
+      jobInput.value = sampleJob;
+      scoreResume();
+    });
+    document.getElementById('focusButton').addEventListener('click', () => {
+      document.getElementById('analyzer').scrollIntoView({ behavior: 'smooth' });
+      resumeInput.focus();
+    });
+    document.getElementById('clearButton').addEventListener('click', () => {
+      resumeInput.value = '';
+      jobInput.value = '';
+      scoreValue.textContent = '0';
+      document.querySelector('.ring').style.background = 'conic-gradient(#464feb 0deg, #e5e7eb 0deg)';
+      statusText.textContent = 'Waiting for analysis';
+      keywordCoverage.textContent = '0%';
+      formatScore.textContent = '0%';
+      missingCount.textContent = '0';
+      matchedSkills.innerHTML = '<span class="chip">No analysis yet</span>';
+      missingSkills.innerHTML = '<span class="chip missing">No major gaps found yet</span>';
+      suggestionsList.innerHTML = '<li>Paste both a resume and a job description to get suggestions.</li>';
+    });
+  </script>
+</body>
+</html>
